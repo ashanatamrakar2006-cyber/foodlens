@@ -1,0 +1,253 @@
+openapi: 3.0.3
+info:
+  title: FOODLENS API
+  version: 1.0.0
+  description: API specification for the FOODLENS platform. Excludes AI service internal endpoints (those are strictly Next.js -> FastAPI).
+
+servers:
+  - url: /api/v1
+    description: Next.js Application API
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        location:
+          type: string
+        rating:
+          type: number
+    
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        barcode:
+          type: string
+        name:
+          type: string
+        ingredients:
+          type: string
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        business_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        description:
+          type: string
+        status:
+          type: string
+          enum: [SUBMITTED, UNDER_REVIEW, RESPONDED, CLOSED]
+
+paths:
+  /businesses:
+    get:
+      summary: Discover food businesses
+      description: Returns nearby businesses based on location coordinates.
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+        - name: lng
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Business'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /products/scan:
+    get:
+      summary: Scan a product
+      description: Look up a product by barcode. Fallback to Open Food Facts if not in local DB.
+      parameters:
+        - name: barcode
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '404':
+          description: Product not found
+
+  /products/{id}/ai-assessment:
+    get:
+      summary: Get AI assessment
+      description: Fetches the AI-assisted assessment for a product. Triggers internal FastAPI call if missing/stale.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: AI Assessment data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    type: string
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+
+  /reports:
+    post:
+      summary: Submit a concern report
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                business_id:
+                  type: string
+                  format: uuid
+                description:
+                  type: string
+                evidence_urls:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '201':
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '401':
+          description: Unauthorized
+    
+    get:
+      summary: Track user reports
+      security:
+        - BearerAuth: []
+      description: Get reports submitted by the authenticated consumer.
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+
+  /evidence/upload:
+    post:
+      summary: Upload evidence
+      security:
+        - BearerAuth: []
+      description: Get a signed URL or upload directly to Supabase storage.
+      responses:
+        '200':
+          description: Upload credentials / path returned
+
+  /business-responses:
+    post:
+      summary: Submit a business response
+      security:
+        - BearerAuth: []
+      description: Allows an authorized business user to respond to a report.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report_id:
+                  type: string
+                  format: uuid
+                response_text:
+                  type: string
+      responses:
+        '201':
+          description: Response saved
+
+  /signals:
+    get:
+      summary: Fetch repeated AI patterns
+      security:
+        - BearerAuth: []
+      description: Stakeholder endpoint to view detected patterns. Requires stakeholder role.
+      responses:
+        '200':
+          description: List of signals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    description:
+                      type: string
+                    report_count:
+                      type: integer

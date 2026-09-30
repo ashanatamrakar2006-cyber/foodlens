@@ -1,0 +1,39 @@
+**/node_modules/
+**/.env
+**/.env.*
+**/*.env
+**/.venv/
+**/venv/
+**/env/
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.next/
+**/out/
+**/dist/
+**/build/
+**/coverage/
+**/.cache/
+**/logs/
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+**/.idea/
+
+# temporary files
+**/tmp/
+**/temp/
+
+# generated local uploads
+**/uploads/
+
+# local AI/model cache directories
+**/model_cache/
+**/ai_cache/
+
+# added for tooling
+**/.vercel/
+**/.turbo/
+**/.eslintcache
