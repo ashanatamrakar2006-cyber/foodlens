@@ -1,3 +1,4 @@
+import businessManageRoutes from './routes/businessManage.js';
 import scanRoutes from './routes/scan.js';
 import meRoutes from './routes/me.js';
 import businessRoutes from './routes/businesses.js';
@@ -12,6 +13,7 @@ app.get('/health', async () => ({ status: 'ok' }));
 await app.register(businessRoutes);
 await app.register(meRoutes);
 await app.register(scanRoutes);
+await app.register(businessManageRoutes);
 app.setErrorHandler((err, req, reply) => {
   req.log.error(err);
   reply.status(err.statusCode || 500).send({ error: err.message });
