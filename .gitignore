@@ -37,3 +37,7 @@
 **/.vercel/
 **/.turbo/
 **/.eslintcache
+
+node_modules
+.env
+!.env.example
