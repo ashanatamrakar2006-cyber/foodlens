@@ -1,3 +1,4 @@
+import notificationRoutes from './routes/notifications.js';
 import reviewRoutes from './routes/reviews.js';
 import businessManageRoutes from './routes/businessManage.js';
 import scanRoutes from './routes/scan.js';
@@ -16,6 +17,7 @@ await app.register(meRoutes);
 await app.register(scanRoutes);
 await app.register(businessManageRoutes);
 await app.register(reviewRoutes);
+await app.register(notificationRoutes);
 app.setErrorHandler((err, req, reply) => {
   req.log.error(err);
   reply.status(err.statusCode || 500).send({ error: err.message });

@@ -1,3 +1,4 @@
+import { createNotification } from '../services/notificationService.js';
 import { auth, requireRole } from '../middleware/auth.js';
 import { createReview, listReviews, respondToReview } from '../services/reviewService.js';
 
@@ -30,6 +31,11 @@ export default async function reviewRoutes(app) {
     const result = await respondToReview(req.params.id, req.user.id, text.trim());
     if (result.error === 'review_not_found') return reply.code(404).send({ error: 'Review not found' });
     if (result.error === 'forbidden') return reply.code(403).send({ error: 'You do not own this business' });
+        await createNotification(result.review.userId, {
+      type: 'review_response',
+      message: 'A business responded to your review',
+      refId: result.review.id,
+    });
     return result.review;
   });
 }

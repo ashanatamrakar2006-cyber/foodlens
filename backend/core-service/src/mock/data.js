@@ -4,3 +4,4 @@ export const businesses = [
   { id: '3', name: 'Annapurna Restaurant', category: 'restaurant', lat: 22.7244, lng: 75.8839, rating: 4.5 },
 ];
 export const reviews = [];
+export const notifications = [];
