@@ -4,17 +4,26 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers import businesses
+
 load_dotenv()
 
 app = FastAPI(title="FoodLens Core Service", version="1.0.0")
 
-origins = [o for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",") if o]
+origins = [
+    o.strip()
+    for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
+    if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(businesses.router)
 
 
 @app.get("/health")
