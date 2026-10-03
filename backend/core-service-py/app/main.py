@@ -1,5 +1,5 @@
 import os
-from app.routers import businesses, me
+from app.routers import businesses, me, scan
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,3 +30,4 @@ app.include_router(businesses.router)
 async def health():
     return {"status": "ok"}
 app.include_router(me.router)
+app.include_router(scan.router)
