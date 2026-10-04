@@ -5,3 +5,18 @@ businesses = [
 ]
 reviews = []
 notifications = []
+products = [
+    {
+        "id": "1",
+        "barcode": "8901234567890",
+        "name": "Sample Biscuits",
+        "brand": "Demo Foods",
+        "ingredients": "Wheat flour, sugar, palm oil, salt",
+        "allergens": ["en:gluten"],
+        "ownerId": "u1",
+    },
+]
+
+batches = [
+    {"id": "1", "productId": "1", "batchNo": "B102", "mfgDate": "2026-08-01", "expiryDate": "2027-02-01"},
+]
